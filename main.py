@@ -1,6 +1,7 @@
 import socketserver
 from threading import Thread
 
+import webrepl_cli
 import websocket, json
 
 connections = {}
@@ -20,6 +21,12 @@ class service(socketserver.BaseRequestHandler):
             result = self.connect_test(command[1:])
         elif command[0] == "send_to_device":
             result = self.send_to_device(command[1:])
+        elif command[0] == "reset":
+            result = self.reset(command[1:])
+        elif command[0] == "disconnect":
+            result = self.disconnect(command[1:])
+        elif command[0] == "upload":
+            result = self.upload(command[1:])
 
         self.request.sendall(result)
 
@@ -43,6 +50,43 @@ class service(socketserver.BaseRequestHandler):
                 return(b'false\n' + str(e).encode())
         else:
             return b'false\nDevice already connected'
+
+    # args: [id, ip]
+    def disconnect(self, args):
+        if args[0] in connections:
+            connections[args[0]].close()
+            del locks[args[0]]
+            del connections[args[0]]
+            return b'true'
+        else:
+            return b'false\nDevice not connected'
+
+    # args: [id, ip]
+    def reset(self, args):
+        if args[0] in connections:
+            while locks[args[0]]:
+                pass
+            locks[args[0]] = True
+            connections[args[0]].send("import machine\r\n")
+            connections[args[0]].send("machine.reset()\r\n")
+            self.disconnect([args[0]])
+            self.connect([args[0], args[1]])
+            locks[args[0]] = False
+            return b'true'
+        else:
+            return b'false\nDevice not connected'
+
+    # args: [id, ip, source, destination]
+    def upload(self, args):
+        id = args[0]
+        ip = args[1]
+        source = args[2]
+        destination = args[3]
+        self.disconnect([id])
+        webrepl_cli.main('secret', ip + ':' + destination, 'put', src_file=source)
+        self.connect([id, ip])
+        self.reset([id, ip])
+        return b'true'
 
     # args: [id]
     def connect_test(self, args):
