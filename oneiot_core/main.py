@@ -66,7 +66,8 @@ class service(socketserver.BaseRequestHandler):
 
     # args: [id, ip]
     def reset(self, args):
-        return b'false\nNot yet implemented'
+        result = requests.get(f'http://{args[1]}/sys/reset')
+        return b'true'
         # if args[0] in connections:
         #     while locks[args[0]]:
         #         pass
@@ -80,21 +81,33 @@ class service(socketserver.BaseRequestHandler):
         # else:
         #     return b'false\nDevice not connected'
 
+    # args: [ip]
+    def reset_webrepl(self, args):
+        conn = websocket.WebSocket()
+        conn.connect("ws://" + args[0] + ":8266")
+        conn.send("secret\n")
+        conn.send("import machine\r\n")
+        conn.send("machine.reset()\r\n")
+        conn.close()
+
     # args: [id, ip, source, destination]
     def upload(self, args):
         id = args[0]
         ip = args[1]
         source = args[2]
         destination = args[3]
-        #self.disconnect([id])
+        requests.get(f'http://{args[1]}/sys/kill')
+        print("Killed")
         webrepl_cli.main('secret', ip + ':' + destination, 'put', src_file=source)
-        #self.connect([id, ip])
-        self.reset([id, ip])
+        print("Uploaded")
+        self.reset_webrepl([ip])
+        print("Reset")
         return b'true'
 
-    # args: [id]
+    # args: [id, ip]
     def connect_test(self, args):
-        return b'true'
+        result = requests.get(f'http://{args[1]}/sys/test')
+        return result.content
         # if args[0] in connections:
         #     return b'true'
         # else:
@@ -140,5 +153,4 @@ if __name__ == "__main__":
     try:
         server.serve_forever()
     except Exception as e:
-        print(e)
         server.shutdown()
