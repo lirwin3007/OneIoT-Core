@@ -26,6 +26,8 @@ class service(socketserver.BaseRequestHandler):
             result = self.send_to_device(command[1:])
         elif command[0] == "reset":
             result = self.reset(command[1:])
+        elif command[0] == "reset_webrepl":
+            result = self.reset_webrepl(command[1:])
         # elif command[0] == "disconnect":
         #     result = self.disconnect(command[1:])
         elif command[0] == "upload":
@@ -89,6 +91,7 @@ class service(socketserver.BaseRequestHandler):
         conn.send("import machine\r\n")
         conn.send("machine.reset()\r\n")
         conn.close()
+        return b'true'
 
     # args: [id, ip, source, destination]
     def upload(self, args):
@@ -96,17 +99,22 @@ class service(socketserver.BaseRequestHandler):
         ip = args[1]
         source = args[2]
         destination = args[3]
-        requests.get(f'http://{args[1]}/sys/kill')
-        print("Killed")
-        webrepl_cli.main('secret', ip + ':' + destination, 'put', src_file=source)
-        print("Uploaded")
-        self.reset_webrepl([ip])
-        print("Reset")
-        return b'true'
+        try:
+            requests.get(f'http://{args[1]}/sys/kill', timeout=1)
+        except:
+            pass
+        try:
+            webrepl_cli.main('secret', ip + ':' + destination, 'put', src_file=source)
+            return b'true'
+        except Exception as e:
+            return b'false'
 
     # args: [id, ip]
     def connect_test(self, args):
-        result = requests.get(f'http://{args[1]}/sys/test')
+        try:
+            result = requests.get(f'http://{args[1]}/sys/test', timeout=1)
+        except:
+            return b'false'
         return result.content
         # if args[0] in connections:
         #     return b'true'
