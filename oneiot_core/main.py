@@ -123,7 +123,7 @@ class service(socketserver.BaseRequestHandler):
 
     # args: [id, ip, command, args (string)]
     def send_to_device(self, args):
-        result = requests.post('http://' + args[1] + '/' + args[2], data=args[3])
+        result = requests.post('http://' + args[1] + '/' + args[2], data=args[3], timeout=3)
         return result.content
         # args[2] = json.loads(args[2])
         # arg_string = ""
