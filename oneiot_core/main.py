@@ -1,8 +1,10 @@
+import os
 import socketserver
 from threading import Thread
 
 import requests
 
+import env
 import webrepl_cli
 import websocket, json
 
@@ -32,6 +34,8 @@ class service(socketserver.BaseRequestHandler):
         #     result = self.disconnect(command[1:])
         elif command[0] == "upload":
             result = self.upload(command[1:])
+        elif command[0] == "heartbeat":
+            result = self.heartbeat(command[1:])
 
         self.request.sendall(result)
 
@@ -152,11 +156,15 @@ class service(socketserver.BaseRequestHandler):
         #
         # return result.encode()
 
+    # args: []
+    def heartbeat(self, args):
+        return b'OK'
+
 class ThreadedTCPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
     pass
 
 if __name__ == "__main__":
-    HOST, PORT = "localhost", 1102
+    HOST, PORT = "localhost", int(env.var("ONEIOT_C_PORT", 1102))
     server = ThreadedTCPServer((HOST, PORT), service)
     try:
         server.serve_forever()
