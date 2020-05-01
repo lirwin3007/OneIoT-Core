@@ -6,28 +6,65 @@ with open("README.md", "r") as fh:
 
 class CustomInstallCommand(install):
     def run(self):
-        import os, sys, subprocess
+        import os, re, sys, subprocess, getpass
+        try:
+            import httplib
+        except:
+            import http.client as httplib
         import datetime
         import configparser
 
         def print_message(status, message, include_time = False):
-        	print('[' + status + ']\t' + message + ('\t' + str(datetime.datetime.now().strftime('%M:%S.%f')) if include_time else ''))
+            print('[' + status + ']\t' + message + ('\t' + str(datetime.datetime.now().strftime('%M:%S.%f')) if include_time else ''))
+
+        def check_internet_connection():
+            print_message('INFO', 'Checking for an active internet connection...')
+            while True:
+                conn = httplib.HTTPConnection("www.google.com", timeout=5)
+                try:
+                    conn.request("HEAD", "/")
+                    conn.close()
+                    print_message('INFO', 'Internet connection found!')
+                    return True
+                except:
+                    conn.close()
+                    print_message('WARN', 'No internet connection found. Please connect to the internet and press [ENTER] to continue.')
+                    input("")
+
+        def is_valid_network_name(name):
+            return re.match('^\w+$', name)
 
         if not __name__ == '__main__':
-        	print_message('FATAL', 'Not executing as top level code')
-        	exit()
+            print_message('FATAL', 'Not executing as top level code')
+            exit()
 
         os.system("clear")
-        print("OneIoT setup")
+        print("OneIoT Core setup")
         print()
         print("Please ensure that you are connected to the internet")
         print("Press [ENTER] to continue")
         input()
 
+        # Check internet connection
+        check_internet_connection()
+
         #Hotspot setup
-        print_message("INFO", "Setting up wireless hotspot")
-        network_name = input("Enter a name for the wireless network used to connect smart device (suggested: OneIoT): ")
-        network_password = input("Enter a secure password: ")
+        print_message("INFO", "Setting up wireless hotspot\n")
+        network_name = input("Enter a name for the wireless network used to connect smart device (default: OneIoT): ")
+        if network_name == "":
+            network_name = "OneIoT"
+        while not is_valid_network_name(network_name):
+            network_name = input("Invalid network name, please enter only alphanumeric characters, or press enter to use the default value:")
+            if network_name == "":
+                network_name = "OneIoT"
+
+        network_password = getpass.getpass("Enter a secure password: ")
+        while network_password == "":
+            network_password = getpass.getpass("Enter a secure password: ")
+
+        confirm_password = getpass.getpass("Confirm password: ")
+        while confirm_password != network_password:
+            confirm_password = getpass.getpass("Confirm password: ")
 
         #Configure static ip
         os.system("printf 'interface wlan0\n\tstatic ip_address=192.168.4.1/24\n\tnohook wpa_supplicant' | sudo tee -a /etc/dhcpcd.conf")
@@ -54,11 +91,9 @@ class CustomInstallCommand(install):
         os.system("sudo systemctl start hostapd")
         os.system("sudo service dnsmasq start")
         print_message("INFO", "Completed setting up wireless hotspot")
-        input()
 
         config = configparser.ConfigParser()
         config['wireless-info'] = {'ssid':network_name, 'psk':network_password}
-        config['assistant'] = {'model-id':model_id, 'project-id':project_id}
 
         oneIot_path = os.path.expanduser("~/.oneIot")
 
@@ -66,7 +101,7 @@ class CustomInstallCommand(install):
             os.makedirs(oneIot_path)
 
         with open(oneIot_path + "/config.ini", 'w') as configfile:
-        	config.write(configfile)
+            config.write(configfile)
 
         os.system("clear")
         print("Device setup complete! please reboot now")
@@ -84,4 +119,7 @@ setup(
     url="https://github.com/lirwin3007/OneIoT-Core",
     packages=find_packages(),
     python_requires='>=3.6',
+    cmdclass={
+        'install': CustomInstallCommand
+    }
 )
