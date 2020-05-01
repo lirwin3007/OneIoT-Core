@@ -109,7 +109,7 @@ class CustomInstallCommand(install):
         install.run(self)
 
 setup(
-    name="oneiot_core",
+    name="oneiot-core",
     version="0.0.1",
     author="Louis Irwin",
     author_email="coding@louisirwin.co.uk",
