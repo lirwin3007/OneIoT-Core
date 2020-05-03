@@ -1,3 +1,3 @@
 name = "oneiot_core"
 
-import main
+#import main

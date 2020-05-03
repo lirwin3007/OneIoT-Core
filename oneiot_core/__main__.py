@@ -4,8 +4,8 @@ from threading import Thread
 
 import requests
 
-import env
-import webrepl_cli
+import oneiot_core.env as env
+import oneiot_core.webrepl_cli as webrepl_cli
 import websocket, json
 
 # connections = {}
@@ -163,10 +163,13 @@ class service(socketserver.BaseRequestHandler):
 class ThreadedTCPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
     pass
 
-if __name__ == "__main__":
+def main():
     HOST, PORT = "localhost", int(env.var("ONEIOT_C_PORT", 1102))
     server = ThreadedTCPServer((HOST, PORT), service)
     try:
         server.serve_forever()
     except Exception as e:
         server.shutdown()
+
+if __name__ == "__main__":
+    main()

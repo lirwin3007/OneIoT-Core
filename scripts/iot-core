@@ -1,0 +1,150 @@
+#!/usr/bin/env python
+
+import os
+import sys
+
+import click
+from clint import textui
+
+import oneiot_core.tools.core as core_lib
+import oneiot_core.tools.network as network_lib
+import oneiot_core.tools.environment as environment_lib
+
+def requires_root(func):
+    def wrapper(*original_args, **original_kwargs):
+        euid = os.geteuid()
+        if euid != 0:
+            print("Sudo required... Switching to sudo")
+            args = ['sudo', sys.executable] + sys.argv + [os.environ]
+            os.execlpe('sudo', *args)
+        func(*original_args, **original_kwargs)
+    return wrapper
+
+@click.group()
+def cli():
+    print()
+
+@cli.group()
+def network():
+    pass
+
+@network.command(name="status")
+def network_status():
+    status = network_lib.get_status()
+
+    textui.puts("Network Setup:")
+    for stat in status["setup"]:
+        if stat['status']:
+            with textui.indent(4):
+                textui.puts(textui.colored.green("✓") + f" {stat['name']}")
+        else:
+            with textui.indent(4):
+                textui.puts(textui.colored.red("✗") + f" {stat['name']}")
+
+    print()
+    textui.puts("Network Status:")
+    for stat in status["status"]:
+        if stat['status']:
+            with textui.indent(4):
+                textui.puts(textui.colored.green("✓") + f" {stat['name']}")
+        else:
+            with textui.indent(4):
+                textui.puts(textui.colored.red("✗") + f" {stat['name']}")
+
+    print()
+
+@network.command(name="restart")
+@requires_root
+def network_restart():
+    print("Restarting network services...")
+    network_lib.restart_services()
+    print("Done")
+    print()
+
+@cli.group()
+def core():
+    pass
+
+@core.command(name="status")
+def core_status():
+    status = core_lib.get_status()
+
+    textui.puts("Setup:")
+    for stat in status["setup"]:
+        if stat['status']:
+            with textui.indent(4):
+                textui.puts(textui.colored.green("✓") + f" {stat['name']}")
+        else:
+            with textui.indent(4):
+                textui.puts(textui.colored.red("✗") + f" {stat['name']}")
+
+    print()
+    textui.puts("Execution Status:")
+    for stat in status["execution"]:
+        if stat['status']:
+            with textui.indent(4):
+                textui.puts(textui.colored.green("✓") + f" {stat['name']}")
+        else:
+            with textui.indent(4):
+                textui.puts(textui.colored.red("✗") + f" {stat['name']}")
+
+    print()
+
+@core.command(name="setup")
+@requires_root
+def core_setup():
+    core_lib.create_service_unit_file()
+    core_lib.start_core_on_boot()
+    core_lib.start_core()
+
+@cli.group()
+def env():
+    pass
+
+@env.command(name="set")
+@click.argument('variable')
+@click.argument('value')
+@requires_root
+def env_set(variable, value):
+    environment_lib.set_variable(variable, value)
+    textui.puts("Environment has been updated in " + textui.colored.red("any future shells."))
+    textui.puts("To restart the core with these new variables, " + textui.colored.red("run the restart command."))
+    print()
+
+@env.command(name="remove")
+@click.argument('variable')
+@requires_root
+def env_remove(variable):
+    environment_lib.unset_variable(variable)
+    textui.puts("Environment has been updated in" + textui.colored.red("any future shells."))
+    textui.puts("To restart the core with these new variables, " + textui.colored.red("run the restart command."))
+    print()
+
+@cli.command()
+def status():
+    network_status = network_lib.get_status()
+    network_setup_status = True
+    for status in network_status['setup']:
+        network_setup_status = network_setup_status and status['status']
+    network_status_status = True
+    for status in network_status['status']:
+        network_status_status = network_status_status and status['status']
+
+    textui.puts("Network:")
+    if network_setup_status:
+        with textui.indent(4):
+            textui.puts(textui.colored.green("✓") + f" Setup")
+    else:
+        with textui.indent(4):
+            textui.puts(textui.colored.red("✗") + f" Setup")
+    if network_status_status:
+        with textui.indent(4):
+            textui.puts(textui.colored.green("✓") + f" Running")
+    else:
+        with textui.indent(4):
+            textui.puts(textui.colored.red("✗") + f" Running")
+
+    print()
+
+if __name__ == '__main__':
+    cli()
