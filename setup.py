@@ -110,7 +110,7 @@ class CustomInstallCommand(install):
 
 setup(
     name="oneiot-core",
-    version="0.1.2",
+    version="0.1.3",
     author="Louis Irwin",
     author_email="coding@louisirwin.co.uk",
     description="OneIoT Core",
