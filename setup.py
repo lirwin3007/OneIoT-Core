@@ -110,7 +110,7 @@ class CustomInstallCommand(install):
 
 setup(
     name="oneiot-core",
-    version="0.0.1",
+    version="0.1.1",
     author="Louis Irwin",
     author_email="coding@louisirwin.co.uk",
     description="OneIoT Core",
@@ -130,4 +130,11 @@ setup(
             'iot-core-main = oneiot_core.__main__:main'
         ]
     },
+    install_requires=[
+        "click",
+        "netifaces",
+        "clint",
+        "pystemd",
+        "websocket-client",
+    ]
 )
