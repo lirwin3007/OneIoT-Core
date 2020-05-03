@@ -53,6 +53,14 @@ def network_status():
 
     print()
 
+@network.command(name="setup")
+@requires_root
+def network_setup():
+    network_lib.setup_static_ip()
+    network_lib.restart_services()
+    network_lib.setup_hostapd()
+    network_lib.setup_dnsmasq()
+
 @network.command(name="restart")
 @requires_root
 def network_restart():
@@ -138,6 +146,29 @@ def status():
         with textui.indent(4):
             textui.puts(textui.colored.red("✗") + f" Setup")
     if network_status_status:
+        with textui.indent(4):
+            textui.puts(textui.colored.green("✓") + f" Running")
+    else:
+        with textui.indent(4):
+            textui.puts(textui.colored.red("✗") + f" Running")
+
+    core_status = core_lib.get_status()
+    core_setup_status = True
+    for status in core_status['setup']:
+        core_setup_status = core_setup_status and status['status']
+    core_execution_status = True
+    for status in core_status['execution']:
+        core_execution_status = core_execution_status and status['status']
+
+    print()
+    textui.puts("Core:")
+    if core_setup_status:
+        with textui.indent(4):
+            textui.puts(textui.colored.green("✓") + f" Setup")
+    else:
+        with textui.indent(4):
+            textui.puts(textui.colored.red("✗") + f" Setup")
+    if core_execution_status:
         with textui.indent(4):
             textui.puts(textui.colored.green("✓") + f" Running")
     else:

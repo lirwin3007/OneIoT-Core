@@ -1,6 +1,9 @@
+import os.path as path
+
 class DHCPDParser():
 
     def __init__(self, path):
+        self.path = path
         self.raw = open(path).read()
         self.modified = self.raw
         self.parse()
@@ -52,11 +55,24 @@ class DHCPDParser():
             result += "\n"
         self.modified = result
 
+    def save(self):
+        f = open(self.path, "w")
+        f.write(self.modified)
+        f.close()
+
 class HostAPDParser():
 
     def __init__(self, configPath, masterConfigPath):
-        self.raw = open(configPath).read()
-        self.master_raw = open(masterConfigPath).read()
+        self.configPath = configPath
+        if path.exists(configPath):
+            self.raw = open(configPath).read()
+        else:
+            self.raw = ""
+        self.masterConfigPath = masterConfigPath
+        if path.exists(masterConfigPath):
+            self.master_raw = open(masterConfigPath).read()
+        else:
+            self.master_raw = ""
         self.modified = self.raw
         self.master_modified = self.master_raw
         self.parse()
@@ -70,12 +86,48 @@ class HostAPDParser():
         lines = self.master_raw.split("\n")
         self.options_master = {x.split("=")[0]: x.split("=")[1] for x in lines if len(x) > 0 and x[0] != "#"}
 
+    def set_options(self, options):
+        result = ""
+        for option in options:
+            result += f"{option}={options[option]}\n"
+        self.modified = result
+
+    def set_master_options(self, options):
+        result = ""
+        for option in options:
+            result += f"{option}={options[option]}\n"
+        self.master_modified = result
+
+    def save(self):
+        f = open(self.configPath, "w")
+        f.write(self.modified)
+        f.close()
+
+    def save_master(self):
+        f = open(self.masterConfigPath, "w")
+        f.write(self.master_modified)
+        f.close()
+
 class DNSMasqParser():
 
     def __init__(self, path):
+        self.path = path
         self.raw = open(path).read()
         self.modified = self.raw
         self.parse()
+
+    def set_options(self, dict, list):
+        result = ""
+        for option in dict:
+            result += f"{option}={dict[option]}\n"
+        for option in list:
+            result += f"{option}\n"
+        self.modified = result
+
+    def save(self):
+        f = open(self.path, "w")
+        f.write(self.modified)
+        f.close()
 
     def parse(self):
         lines = self.raw.split("\n")
