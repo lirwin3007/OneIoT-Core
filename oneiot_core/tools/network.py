@@ -1,5 +1,5 @@
+import os
 import os.path as path
-import os.mkdir as mkdir
 
 import netifaces
 from pystemd.systemd1 import Unit
@@ -168,7 +168,7 @@ def setup_hostapd():
     psk = prompt.query('Network Password (8-63 alphanumeric chars)', validators=[validators.RegexValidator(regex=r"([a-z]|[0-9]){8,63}", message="Password must be 8 to 63 alphanumeric characters")])
 
     if not path.exists("/etc/hostapd"):
-        mkdir("/etc/hostapd")
+        os.mkdir("/etc/hostapd")
 
     hostapd = Parsers.HostAPDParser("/etc/hostapd/hostapd.conf", "/etc/default/hostapd")
     hostapd.set_options({
