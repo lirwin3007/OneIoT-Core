@@ -159,6 +159,7 @@ def setup_static_ip():
 
 def setup_hostapd():
     if get_hostapd_setup_status():
+        print(get_hostapd_setup_status())
         return
 
     print("Installing Hostapd...")
