@@ -208,7 +208,7 @@ def setup_dnsmasq():
         return
 
     print("Installing Dnsmasq...")
-    os.system('apt-get -yq install udhcpd')
+    os.system('apt-get -yq install dnsmasq')
     print("... done!")
 
     print("Setting up dnsmasq config...")
