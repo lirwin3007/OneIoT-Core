@@ -161,6 +161,10 @@ def setup_hostapd():
     if get_hostapd_setup_status():
         return
 
+    print("Installing Hostapd...")
+    os.system('apt-get -yq install hostapd')
+    print("... done!")
+
     print("Setting up hostapd config...")
 
     interface = env.var("ONEIOT_C_NETWORK_INTERFACE")
