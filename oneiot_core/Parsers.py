@@ -4,7 +4,10 @@ class DHCPDParser():
 
     def __init__(self, path):
         self.path = path
-        self.raw = open(path).read()
+        if path.exists(configPath):
+            self.raw = open(path).read()
+        else:
+            self.raw = ""
         self.modified = self.raw
         self.parse()
 
@@ -112,7 +115,10 @@ class DNSMasqParser():
 
     def __init__(self, path):
         self.path = path
-        self.raw = open(path).read()
+        if path.exists(configPath):
+            self.raw = open(path).read()
+        else:
+            self.raw = ""
         self.modified = self.raw
         self.parse()
 
@@ -144,7 +150,10 @@ class EnvParser():
 
     def __init__(self, path):
         self.path = path
-        self.raw = open(path).read()
+        if path.exists(configPath):
+            self.raw = open(path).read()
+        else:
+            self.raw = ""
         self.parse()
 
     def parse(self):
