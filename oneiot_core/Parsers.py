@@ -2,10 +2,10 @@ import os.path as path
 
 class DHCPDParser():
 
-    def __init__(self, path):
-        self.path = path
+    def __init__(self, configPath):
+        self.path = configPath
         if path.exists(configPath):
-            self.raw = open(path).read()
+            self.raw = open(configPath).read()
         else:
             self.raw = ""
         self.modified = self.raw
@@ -113,10 +113,10 @@ class HostAPDParser():
 
 class DNSMasqParser():
 
-    def __init__(self, path):
-        self.path = path
+    def __init__(self, configPath):
+        self.path = configPath
         if path.exists(configPath):
-            self.raw = open(path).read()
+            self.raw = open(configPath).read()
         else:
             self.raw = ""
         self.modified = self.raw
@@ -148,10 +148,10 @@ class DNSMasqParser():
 
 class EnvParser():
 
-    def __init__(self, path):
-        self.path = path
+    def __init__(self, configPath):
+        self.path = configPath
         if path.exists(configPath):
-            self.raw = open(path).read()
+            self.raw = open(configPath).read()
         else:
             self.raw = ""
         self.parse()
