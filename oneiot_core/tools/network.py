@@ -63,6 +63,8 @@ def get_hostapd_setup_status():
     hostapd = Parsers.HostAPDParser("/etc/hostapd/hostapd.conf", "/etc/default/hostapd")
 
     options = hostapd.options
+    print(options)
+    print(ssid)
     result = options['interface'] == interface
     result = result and options['driver'] == 'nl80211'
     result = result and options['ssid'] == ssid
