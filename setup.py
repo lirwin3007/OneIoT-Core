@@ -110,14 +110,14 @@ class CustomInstallCommand(install):
 
 setup(
     name="oneiot-core",
-    version="0.1.4",
+    version="0.1.5",
     author="Louis Irwin",
     author_email="coding@louisirwin.co.uk",
     description="OneIoT Core",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/lirwin3007/OneIoT-Core",
-    packages=find_packages(),
+    packages=['oneiot_core', 'oneiot_core.tools'],
     python_requires='>=3.6',
     cmdclass={
         'install': CustomInstallCommand
