@@ -207,6 +207,10 @@ def setup_dnsmasq():
     if get_dnsmasq_setup_status():
         return
 
+    print("Installing Dnsmasq...")
+    os.system('apt-get -yq install udhcpd')
+    print("... done!")
+
     print("Setting up dnsmasq config...")
 
     interface = env.var("ONEIOT_C_NETWORK_INTERFACE")
