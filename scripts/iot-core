@@ -57,9 +57,9 @@ def network_status():
 @requires_root
 def network_setup():
     network_lib.setup_static_ip()
-    network_lib.restart_services()
     network_lib.setup_hostapd()
     network_lib.setup_dnsmasq()
+    network_lib.restart_services()
 
 @network.command(name="restart")
 @requires_root
