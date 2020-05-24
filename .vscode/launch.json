@@ -1,0 +1,29 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Event Bus",
+            "type": "python",
+            "request": "launch",
+            "program": "/home/pi/OneIoT/OneIoT-Core/oneiot_core/coreUtils/EventBus.py",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "IoT Schedule",
+            "type": "python",
+            "request": "launch",
+            "program": "/home/pi/OneIoT/OneIoT-Core/oneiot_core/iot-schedule.py",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "IoT Serve",
+            "type": "python",
+            "request": "launch",
+            "program": "/home/pi/OneIoT/OneIoT-Core/scripts/iot-serve",
+            "console": "integratedTerminal"
+        }
+    ]
+}

@@ -123,18 +123,20 @@ setup(
         'install': CustomInstallCommand
     },
     scripts=[
-        'scripts/iot-core'
+        'scripts/iot-core',
+        'scripts/iot-serve'
     ],
-    entry_points={
-        'console_scripts': [
-            'iot-core-main = oneiot_core.__main__:main'
-        ]
-    },
+    #entry_points={
+    #    'console_scripts': [
+    #        'iot-core-main = oneiot_core.__main__:main'
+    #    ]
+    #},
     install_requires=[
         "click",
         "netifaces",
         "clint",
         "pystemd",
         "websocket-client",
+        "websockets"
     ]
 )
