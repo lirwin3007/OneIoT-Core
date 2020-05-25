@@ -7,11 +7,13 @@ from pystemd.systemd1 import Unit
 
 def get_status():
     # Get setup status
+    scheduler_is_installed = check_scheduler_is_installed()
     service_file_created_status = get_service_file_created_status()
     service_is_enabled = check_service_is_enabled()
     # Get executing status
     service_is_running = check_service_is_running()
     return {"setup": [
+            {"name": "Scheduler is installed", "status": scheduler_is_installed},
             {"name": "Scheduler Service unit file exists", "status": service_file_created_status},
             {"name": "Scheduler Service starts on boot", "status": service_is_enabled},
         ],
@@ -19,6 +21,13 @@ def get_status():
             {"name": "Scheduler Service is running", "status": service_is_running},
         ]
     }
+
+def check_scheduler_is_installed():
+    try:
+        import oneiot_scheduler
+        return True
+    except:
+        return False
 
 def get_service_file_created_status():
     if not path.exists("/lib/systemd/system/oneiotscheduler.service"):
