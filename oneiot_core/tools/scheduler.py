@@ -102,6 +102,6 @@ def start_scheduler_on_boot():
 def start_scheduler():
     if check_service_is_running():
         return
-    print("Starting OneIoT Core...")
+    print("Starting OneIoT Scheduler...")
     os.system('systemctl start oneiotscheduler.service')
     print("... done!")
