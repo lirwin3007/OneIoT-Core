@@ -202,6 +202,7 @@ def setup_hostapd():
     })
     hostapd.save_master()
 
+    os.system('systemctl unmask hostapd')
     os.system('update-rc.d hostapd enable')
 
     print(".. done!")

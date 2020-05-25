@@ -43,7 +43,7 @@ def get_service_file_created_status():
 
     result = unit_file['Unit']['After'] == "multi-user.target"
     result = result and unit_file['Service']['Type'] == "idle"
-    result = result and unit_file['Service']['ExecStart'] == "iot-core-main"
+    result = result and unit_file['Service']['ExecStart'] == "iot-core-serve"
     result = result and unit_file['Install']['WantedBy'] == "multi-user.target"
 
     st = os.stat("/lib/systemd/system/oneiotcore.service")
@@ -74,7 +74,7 @@ def create_service_unit_file():
     }
     unit_file['Service'] = {
         'Type': 'idle',
-        'ExecStart': 'iot-core-main'
+        'ExecStart': 'iot-core-serve'
     }
     unit_file['Install'] = {
         'WantedBy': 'multi-user.target'
