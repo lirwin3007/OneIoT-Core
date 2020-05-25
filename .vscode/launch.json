@@ -12,13 +12,6 @@
             "console": "integratedTerminal"
         },
         {
-            "name": "IoT Schedule",
-            "type": "python",
-            "request": "launch",
-            "program": "/home/pi/OneIoT/OneIoT-Core/oneiot_core/iot-schedule.py",
-            "console": "integratedTerminal"
-        },
-        {
             "name": "IoT Serve",
             "type": "python",
             "request": "launch",

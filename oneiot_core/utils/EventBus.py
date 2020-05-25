@@ -77,7 +77,8 @@ class EventBus():
             asyncio.get_running_loop().stop()
 
     async def consumer_handler(self, message):
-        print(message)
+        #print(message)
+        pass
 
     def send(self, id, data):
         message = json.dumps({
