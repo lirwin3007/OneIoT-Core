@@ -8,6 +8,7 @@ from clint import textui
 
 import oneiot_core.tools.core as core_lib
 import oneiot_core.tools.network as network_lib
+import oneiot_core.tools.scheduler as scheduler_lib
 import oneiot_core.tools.environment as environment_lib
 
 def requires_root(func):
@@ -104,6 +105,42 @@ def core_setup():
     core_lib.create_service_unit_file()
     core_lib.start_core_on_boot()
     core_lib.start_core()
+
+@cli.group()
+def scheduler():
+    pass
+
+@scheduler.command(name="status")
+def scheduler_status():
+    status = scheduler_lib.get_status()
+
+    textui.puts("Setup:")
+    for stat in status["setup"]:
+        if stat['status']:
+            with textui.indent(4):
+                textui.puts(textui.colored.green("✓") + f" {stat['name']}")
+        else:
+            with textui.indent(4):
+                textui.puts(textui.colored.red("✗") + f" {stat['name']}")
+
+    print()
+    textui.puts("Execution Status:")
+    for stat in status["execution"]:
+        if stat['status']:
+            with textui.indent(4):
+                textui.puts(textui.colored.green("✓") + f" {stat['name']}")
+        else:
+            with textui.indent(4):
+                textui.puts(textui.colored.red("✗") + f" {stat['name']}")
+
+    print()
+
+@scheduler.command(name="setup")
+@requires_root
+def scheduler_setup():
+    scheduler_lib.create_service_unit_file()
+    scheduler_lib.start_scheduler_on_boot()
+    scheduler_lib.start_scheduler()
 
 @cli.group()
 def env():
