@@ -212,6 +212,29 @@ def status():
         with textui.indent(4):
             textui.puts(textui.colored.red("✗") + f" Running")
 
+    scheduler_status = scheduler_lib.get_status()
+    scheduler_setup_status = True
+    for status in scheduler_status['setup']:
+        scheduler_setup_status = scheduler_setup_status and status['status']
+    scheduler_execution_status = True
+    for status in scheduler_status['execution']:
+        scheduler_execution_status = scheduler_execution_status and status['status']
+
+    print()
+    textui.puts("Scheduler:")
+    if scheduler_setup_status:
+        with textui.indent(4):
+            textui.puts(textui.colored.green("✓") + f" Setup")
+    else:
+        with textui.indent(4):
+            textui.puts(textui.colored.red("✗") + f" Setup")
+    if scheduler_execution_status:
+        with textui.indent(4):
+            textui.puts(textui.colored.green("✓") + f" Running")
+    else:
+        with textui.indent(4):
+            textui.puts(textui.colored.red("✗") + f" Running")
+
     print()
 
 if __name__ == '__main__':
