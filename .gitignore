@@ -2,6 +2,9 @@
 out.raw
 config.ini
 
+# VSCode
+.vscode/
+
 ### Python ###
 # Byte-compiled / optimized / DLL files
 __pycache__/

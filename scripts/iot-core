@@ -6,6 +6,7 @@ import sys
 import click
 from clint import textui
 
+import oneiot.EventBus as EventBus
 import oneiot_core.tools.core as core_lib
 import oneiot_core.tools.network as network_lib
 import oneiot_core.tools.scheduler as scheduler_lib
@@ -141,6 +142,46 @@ def scheduler_setup():
     scheduler_lib.create_service_unit_file()
     scheduler_lib.start_scheduler_on_boot()
     scheduler_lib.start_scheduler()
+
+@cli.group()
+def devices():
+    pass
+
+token = None
+
+@devices.command(name="add")
+def devices_add():
+    eb = EventBus(core_ip="localhost")
+    eb.connect()
+    eb.send('device_manager.add_device')
+
+    def log(id, data, eb):
+        print(f'[{data["type"]}]\t{data["message"]}')
+
+    def step(id, data, eb):
+        print()
+        print(data['next_step']['instruction'])
+        promptedData = {}
+        for question in data['next_step']['required_info']:
+            promptedData[question['id']] = input(f'{question["prompt"]} ({question["tip"]}): ')
+        print("Press enter to confirm")
+        input()
+        eb.send(f'device_manager.add_device.{token}.{data["next_step"]["id"]}', promptedData)
+
+    def complete(id, data, eb):
+        print("Device added succesfully!")
+        eb.disconnect()
+
+    def confirmed(id, data, eb):
+        global token
+        if token == None:
+            token = id.split('.')[-2]
+            eb.on(f'device_manager.add_device.{token}.log', log)
+            eb.on(f'device_manager.add_device.{token}.confirm', step)
+            eb.on(f'device_manager.add_device.{token}.complete', complete)
+            step(id, data, eb)
+
+    eb.on('device_manager.add_device.*.confirm', confirmed)
 
 @cli.group()
 def env():

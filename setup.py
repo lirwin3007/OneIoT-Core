@@ -137,6 +137,7 @@ setup(
         "clint",
         "pystemd",
         "websocket-client",
-        "websockets"
+        "websockets",
+        "oneiot"
     ]
 )
